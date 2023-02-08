@@ -9,9 +9,24 @@ interface Validatable {
 }
 
 function validate(validatableInput: Validatable){
-    let isValid = false
+    let isValid = true
     if(validatableInput.required){
         isValid = isValid && validatableInput.value.toString().trim().length !== 0
+    }
+    if(validatableInput.minLength && typeof validatableInput.value === "string"){
+        isValid = isValid && validatableInput.value.trim().length >= validatableInput.minLength;
+    }
+
+    if(validatableInput.maxLength && typeof validatableInput.value === "string"){
+        isValid = isValid && validatableInput.value.trim().length <= validatableInput.maxLength;
+    }
+
+    if(validatableInput.min && typeof validatableInput.value === "number"){
+        isValid = isValid && validatableInput.value >= validatableInput.min;
+    }
+
+    if(validatableInput.max && typeof validatableInput.value === "number"){
+        isValid = isValid && validatableInput.value <= validatableInput.max;
     }
 
     return isValid
@@ -66,11 +81,21 @@ class ProjectInput {
         const title = this.titleInputElement.value;
         const description = this.descriptionInputElement.value;
         const peopole = this.peopoleInputElement.value;
-    
+
+        const titleValidatable : Validatable = {
+            value: title, required: true, minLength: 5
+        }
+        const descriptionValidatable : Validatable = {
+            value: description, required: true, minLength: 5
+        }
+        const peopleValidatable : Validatable = {
+            value: +peopole, required: true, min: 1
+        }
+
         if(
-            title.trim().length === 0 ||
-            description.trim().length === 0 ||
-            peopole.trim().length === 0
+            !(validate(titleValidatable)&&
+            validate(descriptionValidatable)&&
+            validate(peopleValidatable))
         ){
             alert("Invalid input, please try again!")
             return;
